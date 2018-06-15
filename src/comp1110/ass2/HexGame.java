@@ -4,7 +4,8 @@ package comp1110.ass2;
  * Created by steveb on 30/07/2015.
  */
 public class HexGame {
-
+    static final int[] BIGGEST = new int[]{0, 6, 18, 36, 60, 90, 126, 168, 216};
+    static final int[] SMALLEST = new int[]{0, 1, 7, 19, 37, 61, 91, 127, 169};
     /**
      * Construct HexGame from a string describing game state.
      * @param game The initial state of the game, described as a string according to the assignment specification.
@@ -27,7 +28,18 @@ public class HexGame {
      */
     public static boolean legitimateCrannies(String crannies) {
         /* FIXME */
-        return false;
+        int length = crannies.length();
+        if(length!=18)
+            return false;
+        boolean[] occupied = new boolean[6];
+        for (int i = 0; i < length; i+=3) {
+            int cranny = Integer.parseInt(crannies.substring(i, i+3));
+            int edge = (cranny - 169)/8;
+            if(edge < 0 || edge > 5 || occupied[edge])
+                return false;
+            occupied[edge] = true;
+        }
+        return true;
     }
 
     /**
@@ -37,7 +49,17 @@ public class HexGame {
      */
     public static boolean legitimateNooks(String nooks) {
         /* FIXME */
-        return false;
+
+        return true;
+    }
+
+
+    private static int[] getNeighborsByNum(int num){
+        int[] output = new int[]{-1, -1, -1, -1, -1, -1};
+        return output;
+    }
+
+    public static void main(String[] args) {
     }
 
     /**
