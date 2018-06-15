@@ -1,5 +1,7 @@
 package comp1110.ass2;
 
+import java.util.Arrays;
+
 /**
  * Created by steveb on 30/07/2015.
  */
@@ -54,12 +56,10 @@ public class HexGame {
     }
 
 
-    private static int[] getNeighborsByNum(int num){
-        int[] output = new int[]{-1, -1, -1, -1, -1, -1};
-        return output;
-    }
-
     public static void main(String[] args) {
+        for (int i = 0; i <=216; i++) {
+            System.out.println(new Hex(i));
+        }
     }
 
     /**
