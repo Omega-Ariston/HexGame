@@ -96,8 +96,6 @@ public class HexGame {
         String crannies = game.substring(0, 18);
         String nooks = game.substring(18, 90);
         String pieces = game.substring(90, length);
-        if(game.equals("173183187197205214" + "093D064D038A100A024B070F075F026B105A052F110D114B033C085F054E089C018E058E" + "093"))
-            legitimateNooks(nooks);
         return legitimateCrannies(crannies) && legitimateNooks(nooks) && legitimatePieces(pieces, nooks);
     }
 
