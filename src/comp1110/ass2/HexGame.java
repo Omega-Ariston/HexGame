@@ -1,13 +1,16 @@
 package comp1110.ass2;
 
-import java.util.Arrays;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by steveb on 30/07/2015.
  */
 public class HexGame {
-    static final int[] BIGGEST = new int[]{0, 6, 18, 36, 60, 90, 126, 168, 216};
-    static final int[] SMALLEST = new int[]{0, 1, 7, 19, 37, 61, 91, 127, 169};
+
+    List<Nook> nooks;
+    List<Integer> crannies;
+    List<Integer> pieces;
     /**
      * Construct HexGame from a string describing game state.
      * @param game The initial state of the game, described as a string according to the assignment specification.
@@ -31,12 +34,14 @@ public class HexGame {
     public static boolean legitimateCrannies(String crannies) {
         /* FIXME */
         int length = crannies.length();
-        if(length!=18)
+        if(length!=18) //NUM_OF_EDGE * 3
             return false;
-        boolean[] occupied = new boolean[6];
+        boolean[] occupied = new boolean[6]; //NUM_OF_EDGE
+        int smallest = Data.SMALLEST[8]; //the outermost layer
+        int numInEdge = Data.NUM_IN_LAYER[8]/6; //the outermost layer
         for (int i = 0; i < length; i+=3) {
             int cranny = Integer.parseInt(crannies.substring(i, i+3));
-            int edge = (cranny - 169)/8;
+            int edge = (cranny - smallest)/numInEdge;
             if(edge < 0 || edge > 5 || occupied[edge])
                 return false;
             occupied[edge] = true;
@@ -46,20 +51,35 @@ public class HexGame {
 
     /**
      * Determine whether a set of nooks are legal according to the assignment specification.
-     * @param nooks A string describing the nooks, encoded according to the assignment specification.
+     * @param s A string describing the nooks, encoded according to the assignment specification.
      * @return True if the nooks are correctly encoded and in legal positions, according to the assignment specification.
      */
-    public static boolean legitimateNooks(String nooks) {
+    public static boolean legitimateNooks(String s) {
         /* FIXME */
+        int length = s.length();
+        if(length!=18*4)
+            return false;
+        List<Nook>[] nooks = new LinkedList[6]; //NUM_OF_EDGE
+        for (int i = 0; i < length; i+=4) {
+            String nookStr= s.substring(i, i+4);
+            if(!Nook.isNookWellFormed(nookStr))
+                return false;
+            int val = Integer.parseInt(nookStr.substring(0,3));
+            Nook nook = Nooks.getNookByValAndOrientation(val, nookStr.charAt(3));
 
-        return true;
-    }
-
-
-    public static void main(String[] args) {
-        for (int i = 0; i <=216; i++) {
-            System.out.println(new Hex(i));
+            int area = nook.getArea();
+            if(area==-1)
+                return false;
+            if(nooks[area]==null)
+                nooks[area] = new LinkedList<>();
+            List nooksInArea = nooks[area];
+            if(nooksInArea.size()>=3)
+                return false;
+            if(nook.neighborOf(nooksInArea))
+                return false;
+            nooksInArea.add(nook);
         }
+        return true;
     }
 
     /**
@@ -69,7 +89,30 @@ public class HexGame {
      */
     public static boolean legitimateGame(String game) {
         /* FIXME */
-        return false;
+        int length = game.length();
+        int minLength = 6*3 + 18*4;
+        if(length < minLength + 3 || length > minLength + 12)
+            return false;
+        String crannies = game.substring(0, 18);
+        String nooks = game.substring(18, 90);
+        String pieces = game.substring(90, length);
+        if(game.equals("173183187197205214" + "093D064D038A100A024B070F075F026B105A052F110D114B033C085F054E089C018E058E" + "093"))
+            legitimateNooks(nooks);
+        return legitimateCrannies(crannies) && legitimateNooks(nooks) && legitimatePieces(pieces, nooks);
+    }
+
+    public static boolean legitimatePieces(String pieces, String nooks){
+        int length = pieces.length();
+        if (!Data.isNumeric(pieces) || length%3!=0)
+            return false;
+        Set s = new HashSet();
+        for (int i = 0; i < length; i+=3) {
+            String piece = pieces.substring(i, i+3);
+            if(!nooks.contains(piece) || s.contains(piece))
+                return false;
+            s.add(piece);
+        }
+        return true;
     }
 
     /**
