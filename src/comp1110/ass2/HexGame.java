@@ -123,6 +123,9 @@ public class HexGame {
         String sc = game.substring(0, 18);
         String sn = game.substring(18, 90);
         String sp = game.substring(90);
+        Pieces pieces = new Pieces(sp);
+        if(!pieces.contains(from))
+            return false;
         Crannies crannies = new Crannies(sc);
         Nooks nooks = new Nooks(sn);
         Hexes.setObstacles(nooks, crannies, true);
