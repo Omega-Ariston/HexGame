@@ -8,6 +8,8 @@ public class Hex {
     private int layer;
     private int edge;
     private int index;
+    private boolean[] obstacles;
+    private int[] availableSteps;
 
     public Hex(int num) {
         this.val = num;
@@ -16,6 +18,18 @@ public class Hex {
         this.edge = ei[0];
         this.index = ei[1];
         this.neighbors = findNeighbors();
+        initialObstacles();
+        availableSteps = new int[]{-2, -2, -2, -2, -2, -2}; //-2 stands for uninitialize, -1 stands for unreachable
+    }
+
+    private void initialObstacles(){
+        obstacles = new boolean[6];
+        if (layer == 8){
+            obstacles[edge] = true;
+            obstacles[(edge+1)%6] = true;
+            if(val == Data.SMALLEST[8] + edge*8)
+                obstacles[edge==0?5:edge-1] = true;
+        }
     }
 
     private int[] getEdgeAndIndexByNum(int num) {
@@ -79,6 +93,21 @@ public class Hex {
         return false;
     }
 
+    public int[] getAvailableSteps(){
+        for (int i = 0; i < 6; i++) {
+            if(availableSteps[i]==-2){
+                Hex hex = this;
+                while(!hex.getObstacles()[i])
+                    hex = Hexes.getHexByNum(hex.getNeighbors()[i]);
+                if(hex==this)
+                    availableSteps[i] = -1;
+                else
+                    availableSteps[i] = hex.getVal();
+            }
+        }
+        return availableSteps;
+    }
+
     public int getVal() {
         return val;
     }
@@ -98,6 +127,8 @@ public class Hex {
     public int[] getNeighbors() {
         return neighbors;
     }
+
+    public boolean[] getObstacles(){ return obstacles;}
 
     @Override
     public String toString() {

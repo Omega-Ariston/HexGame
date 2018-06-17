@@ -8,9 +8,6 @@ import java.util.regex.Pattern;
  */
 public class HexGame {
 
-    List<Nook> nooks;
-    List<Integer> crannies;
-    List<Integer> pieces;
     /**
      * Construct HexGame from a string describing game state.
      * @param game The initial state of the game, described as a string according to the assignment specification.
@@ -60,19 +57,20 @@ public class HexGame {
         if(length!=18*4)
             return false;
         List<Nook>[] nooks = new LinkedList[6]; //NUM_OF_EDGE
+        Nooks nooksCollection = new Nooks();
         for (int i = 0; i < length; i+=4) {
             String nookStr= s.substring(i, i+4);
             if(!Nook.isNookWellFormed(nookStr))
                 return false;
             int val = Integer.parseInt(nookStr.substring(0,3));
-            Nook nook = Nooks.getNookByValAndOrientation(val, nookStr.charAt(3));
+            Nook nook = nooksCollection.setNookByValAndOrientation(val, nookStr.charAt(3));
 
             int area = nook.getArea();
             if(area==-1)
                 return false;
             if(nooks[area]==null)
                 nooks[area] = new LinkedList<>();
-            List nooksInArea = nooks[area];
+            List<Nook> nooksInArea = nooks[area];
             if(nooksInArea.size()>=3)
                 return false;
             if(nook.neighborOf(nooksInArea))
@@ -122,6 +120,17 @@ public class HexGame {
      */
     public static boolean legitimateStep(String game, int from, int to) {
         /* FIXME */
+        String sc = game.substring(0, 18);
+        String sn = game.substring(18, 90);
+        String sp = game.substring(90);
+        Crannies crannies = new Crannies(sc);
+        Nooks nooks = new Nooks(sn);
+        Hexes.setObstacles(nooks, crannies, true);
+        for (int i: Hexes.getHexByNum(from).getAvailableSteps()
+             ) {
+            if(i==to)
+                return true;
+        }
         return false;
     }
 
